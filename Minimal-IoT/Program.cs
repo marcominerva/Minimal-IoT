@@ -1,9 +1,12 @@
 using System.Device.Gpio;
+using Iot.Device.Common;
+using Iot.Device.DHTxx;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton<GpioController>(new GpioController(PinNumberingScheme.Board));
+builder.Services.AddSingleton<Dht22>(services => new Dht22(pin: 7, PinNumberingScheme.Board, services.GetRequiredService<GpioController>(), false));
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options => options.SwaggerDoc("v1", new OpenApiInfo { Title = "Minimal IoT" }));
@@ -57,5 +60,26 @@ app.MapPost("/api/led", (GpioController controller, string color) =>
 .Produces(StatusCodes.Status204NoContent)
 .WithName("SetLedColor");
 
-app.Run();
+app.MapPost("/api/humiture", (Dht22 dht22) =>
+{
+    var temperature = dht22.Temperature;
+    var humidity = dht22.Humidity;
 
+    if (dht22.IsLastReadSuccessful)
+    {
+        Results.Ok(new
+        {
+            Temperature = Math.Round(temperature.DegreesCelsius, 2),
+            Humidity = Math.Round(humidity.Percent, 2),
+            HeatIndex = Math.Round(WeatherHelper.CalculateHeatIndex(temperature, humidity).DegreesCelsius, 2),
+            AbsoluteHumidity = Math.Round(WeatherHelper.CalculateAbsoluteHumidity(temperature, humidity).GramsPerCubicMeter, 2)
+        });
+    }
+
+    return Results.StatusCode(StatusCodes.Status504GatewayTimeout);
+})
+.Produces(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status504GatewayTimeout)
+.WithName("GetHumiture");
+
+app.Run();
