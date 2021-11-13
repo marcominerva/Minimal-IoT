@@ -1,43 +1,61 @@
+using System.Device.Gpio;
+using Microsoft.OpenApi.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddSingleton<GpioController>(new GpioController(PinNumberingScheme.Board));
+
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options => options.SwaggerDoc("v1", new OpenApiInfo { Title = "Minimal IoT" }));
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+app.UseSwagger();
+app.UseSwaggerUI(options =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    options.RoutePrefix = string.Empty;
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "Minimal IoT API v1");
+});
 
-app.UseHttpsRedirection();
-
-var summaries = new[]
+app.MapPost("/api/led", (GpioController controller, string color) =>
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+    const int redPinNumber = 36;
+    const int greenPinNumber = 37;
+    const int bluePinNumber = 38;
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-       new WeatherForecast
-       (
-           DateTime.Now.AddDays(index),
-           Random.Shared.Next(-20, 55),
-           summaries[Random.Shared.Next(summaries.Length)]
-       ))
-        .ToArray();
-    return forecast;
+    SetPin(redPinNumber, PinValue.Low);
+    SetPin(greenPinNumber, PinValue.Low);
+    SetPin(bluePinNumber, PinValue.Low);
+
+    int? pin = color?.ToLowerInvariant() switch
+    {
+        "red" => redPinNumber,
+        "green" => greenPinNumber,
+        "blue" => bluePinNumber,
+        "black" => null,
+        null => null,
+        _ => throw new NotSupportedException()
+    };
+
+    if (pin.HasValue)
+    {
+        SetPin(pin.Value, PinValue.High);
+    }
+
+    return Results.NoContent();
+
+    void SetPin(int pinNumber, PinValue value)
+    {
+        if (!controller.IsPinOpen(pinNumber))
+        {
+            controller.OpenPin(pinNumber, PinMode.Output);
+        }
+
+        controller.Write(pinNumber, value);
+    }
 })
-.WithName("GetWeatherForecast");
+.Produces(StatusCodes.Status204NoContent)
+.WithName("SetLedColor");
 
 app.Run();
 
-internal record WeatherForecast(DateTime Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
