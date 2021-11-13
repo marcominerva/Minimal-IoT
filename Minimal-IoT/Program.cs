@@ -6,7 +6,7 @@ using Microsoft.OpenApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton<GpioController>(new GpioController(PinNumberingScheme.Board));
-builder.Services.AddSingleton<Dht22>(services => new Dht22(pin: 7, PinNumberingScheme.Board, services.GetRequiredService<GpioController>(), false));
+builder.Services.AddSingleton<Dht22>(services => new Dht22(pin: 7, gpioController: services.GetRequiredService<GpioController>(), shouldDispose: false));
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options => options.SwaggerDoc("v1", new OpenApiInfo { Title = "Minimal IoT" }));
