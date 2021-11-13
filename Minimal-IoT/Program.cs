@@ -66,7 +66,7 @@ app.MapGet("/api/humiture", (Dht22 dht22) =>
 
     if (dht22.IsLastReadSuccessful)
     {
-        Results.Ok(new
+        return Results.Ok(new
         {
             Temperature = Math.Round(temperature.DegreesCelsius, 2),
             Humidity = Math.Round(humidity.Percent, 2),
