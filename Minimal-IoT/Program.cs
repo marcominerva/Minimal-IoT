@@ -35,8 +35,7 @@ app.MapPost("/api/led", (GpioController controller, string color) =>
         "red" => redPinNumber,
         "green" => greenPinNumber,
         "blue" => bluePinNumber,
-        "black" => null,
-        null => null,
+        "black" or "blank" or null => null,
         _ => throw new NotSupportedException()
     };
 
@@ -60,7 +59,7 @@ app.MapPost("/api/led", (GpioController controller, string color) =>
 .Produces(StatusCodes.Status204NoContent)
 .WithName("SetLedColor");
 
-app.MapPost("/api/humiture", (Dht22 dht22) =>
+app.MapGet("/api/humiture", (Dht22 dht22) =>
 {
     var temperature = dht22.Temperature;
     var humidity = dht22.Humidity;
