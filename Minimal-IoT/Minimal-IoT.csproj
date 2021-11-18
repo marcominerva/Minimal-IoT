@@ -1,15 +1,22 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <RootNamespace>$(MSBuildProjectName.Replace("-", ""))</RootNamespace>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<RootNamespace>$(MSBuildProjectName.Replace("-", ""))</RootNamespace>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Iot.Device.Bindings" Version="1.5.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
-  </ItemGroup>
+	<ItemGroup>
+		<Using Include="System.Device.Gpio" />
+		<Using Include="Iot.Device.Common" />
+		<Using Include="Iot.Device.DHTxx" />
+		<Using Include="Microsoft.OpenApi.Models" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Iot.Device.Bindings" Version="1.5.0" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+	</ItemGroup>
 
 </Project>

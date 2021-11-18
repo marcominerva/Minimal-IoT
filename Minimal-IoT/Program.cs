@@ -1,8 +1,3 @@
-using System.Device.Gpio;
-using Iot.Device.Common;
-using Iot.Device.DHTxx;
-using Microsoft.OpenApi.Models;
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton<GpioController>(new GpioController(PinNumberingScheme.Board));

@@ -80,7 +80,7 @@ csharp_style_expression_bodied_constructors = false:silent
 csharp_style_expression_bodied_indexers = true:silent
 csharp_style_expression_bodied_lambdas = true:silent
 csharp_style_expression_bodied_local_functions = true:silent
-csharp_style_expression_bodied_methods =false:silent
+csharp_style_expression_bodied_methods = when_on_single_line:silent
 csharp_style_expression_bodied_operators = true:silent
 csharp_style_expression_bodied_properties = true:silent
 
@@ -248,4 +248,3 @@ dotnet_diagnostic.IDE0010.severity = none
 
 # IDE0072: Add missing cases
 dotnet_diagnostic.IDE0072.severity = none
-csharp_style_namespace_declarations=file_scoped:silent
